@@ -38,8 +38,10 @@ jobs:
 
       # Run the Next.js build command
       - name: Build project
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: npm run build
 
-    #   # Run tests
-    #   - name: Run tests
-    #     run: npm test
+      # Uncomment to run tests if needed
+      # - name: Run tests
+      #   run: npm test
