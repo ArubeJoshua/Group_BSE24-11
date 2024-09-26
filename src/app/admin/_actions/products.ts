@@ -5,6 +5,7 @@ import { z } from "zod"
 import fs from "fs/promises"
 import { notFound, redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
+import crypto from "crypto"
 
 const fileSchema = z.instanceof(File, { message: "Required" })
 const imageSchema = fileSchema.refine(
@@ -29,14 +30,16 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 
   await fs.mkdir("products", { recursive: true })
   const filePath = `products/${crypto.randomUUID()}-${data.file.name}`
-  await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
+
+  // Correct conversion of ArrayBuffer to Buffer
+  const fileBuffer = Buffer.from(new Uint8Array(await data.file.arrayBuffer()))
+  await fs.writeFile(filePath, fileBuffer)
 
   await fs.mkdir("public/products", { recursive: true })
   const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`
-  await fs.writeFile(
-    `public${imagePath}`,
-    Buffer.from(await data.image.arrayBuffer())
-  )
+
+  const imageBuffer = Buffer.from(new Uint8Array(await data.image.arrayBuffer()))
+  await fs.writeFile(`public${imagePath}`, imageBuffer)
 
   await db.product.create({
     data: {
@@ -79,17 +82,18 @@ export async function updateProduct(
   if (data.file != null && data.file.size > 0) {
     await fs.unlink(product.filePath)
     filePath = `products/${crypto.randomUUID()}-${data.file.name}`
-    await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
+
+    const fileBuffer = Buffer.from(new Uint8Array(await data.file.arrayBuffer()))
+    await fs.writeFile(filePath, fileBuffer)
   }
 
   let imagePath = product.imagePath
   if (data.image != null && data.image.size > 0) {
     await fs.unlink(`public${product.imagePath}`)
     imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`
-    await fs.writeFile(
-      `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
-    )
+
+    const imageBuffer = Buffer.from(new Uint8Array(await data.image.arrayBuffer()))
+    await fs.writeFile(`public${imagePath}`, imageBuffer)
   }
 
   await db.product.update({
