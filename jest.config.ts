@@ -16,6 +16,7 @@ const config: Config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1', // Adjust the path to match your project structure
   },
+  
 }
 
 // Export Jest config so next/jest can load the Next.js config
