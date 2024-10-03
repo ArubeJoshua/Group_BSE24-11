@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npx prisma generate",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "dev-2": "next start --port 3001",
     "lint": "next lint",
