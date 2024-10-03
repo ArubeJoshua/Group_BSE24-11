@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && npx prisma generate",
     "start": "next start",
+    "dev-2": "next start --port 3001",
     "lint": "next lint",
     "email": "cp .env ./node_modules/react-email && email dev --dir src/email --port 3001",
     "test": "jest"
