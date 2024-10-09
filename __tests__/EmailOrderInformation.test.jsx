@@ -29,4 +29,16 @@ describe("OrderInformation - Order ID", () => {
     expect(screen.getByText("Order ID")).toBeInTheDocument();
     expect(screen.getByText(mockOrder.id)).toBeInTheDocument();
   });
+
+  it("renders product description correctly", () => {
+    render(
+      <OrderInformation
+        order={mockOrder}
+        product={mockProduct}
+        downloadVerificationId={downloadVerificationId}
+      />
+    );
+
+    expect(screen.getByText("This is a sample product.")).toBeInTheDocument();
+  });
 });
