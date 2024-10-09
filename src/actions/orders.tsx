@@ -43,7 +43,7 @@ export async function emailOrderHistory(
   if (user == null) {
     return {
       message:
-        "Check your email to view your order history and download your products.",
+        "No orders have been made with this email",
     }
   }
 
@@ -69,6 +69,7 @@ export async function emailOrderHistory(
   })
 
   if (data.error) {
+    console.log(data.error)
     return { error: "There was an error sending your email. Please try again." }
   }
 
