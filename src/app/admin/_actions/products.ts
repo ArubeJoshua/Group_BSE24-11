@@ -3,6 +3,7 @@
 import db from "@/db/db"
 import { z } from "zod"
 import fs from "fs/promises"
+import { v4 as uuidv4 } from 'uuid';
 import { notFound, redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 
@@ -28,17 +29,17 @@ export async function addProduct(prevState: unknown, formData: FormData) {
   const data = result.data
 
   await fs.mkdir("products", { recursive: true })
-  const filePath = `products/${crypto.randomUUID()}-${data.file.name}`
+  const filePath = `products/${uuidv4()}-${data.file.name}`
   await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
 
   await fs.mkdir("public/products", { recursive: true })
-  const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`
+  const imagePath = `/products/${uuidv4()}-${data.image.name}`
   await fs.writeFile(
     `public${imagePath}`,
     Buffer.from(await data.image.arrayBuffer())
   )
 
-  await db.product.create({
+  const product = await db.product.create({
     data: {
       isAvailableForPurchase: false,
       name: data.name,
@@ -49,10 +50,14 @@ export async function addProduct(prevState: unknown, formData: FormData) {
     },
   })
 
-  revalidatePath("/")
-  revalidatePath("/products")
-
-  redirect("/admin/products")
+  return {
+    name: product.name,
+    description: product.description,
+    priceInCents: product.priceInCents,
+    filePath: product.filePath,
+    imagePath: product.imagePath,
+    isAvailableForPurchase: product.isAvailableForPurchase,
+  };
 }
 
 const editSchema = addSchema.extend({
@@ -78,14 +83,14 @@ export async function updateProduct(
   let filePath = product.filePath
   if (data.file != null && data.file.size > 0) {
     await fs.unlink(product.filePath)
-    filePath = `products/${crypto.randomUUID()}-${data.file.name}`
+    filePath = `products/${uuidv4()}-${data.file.name}`
     await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
   }
 
   let imagePath = product.imagePath
   if (data.image != null && data.image.size > 0) {
     await fs.unlink(`public${product.imagePath}`)
-    imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`
+    imagePath = `/products/${uuidv4()}-${data.image.name}`
     await fs.writeFile(
       `public${imagePath}`,
       Buffer.from(await data.image.arrayBuffer())

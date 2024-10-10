@@ -10,12 +10,48 @@ import { addProduct, updateProduct } from "../../_actions/products"
 import { useFormState, useFormStatus } from "react-dom"
 import { Product } from "@prisma/client"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 export function ProductForm({ product }: { product?: Product | null }) {
+  const [formData, setFormData] = useState({
+    name: product?.name || '',
+    description: product?.description || '',
+    priceInCents: product?.priceInCents || '',
+    file: null,
+    image: null,
+    isAvailableForPurchase: product?.isAvailableForPurchase || false,
+  });
+  
+  const router = useRouter();
+
+  const handleSuccess = async () => {
+    await fetch('/api/revalidate?path=/');
+    await fetch('/api/revalidate?path=/products');
+
+    router.push('/admin/products');
+  };
+
+  const wrappedAddProduct = async (prevState: unknown, formData: FormData) => {
+    const result = await addProduct(null, formData);
+    if (result) {
+      await handleSuccess();
+    }
+    return result;
+  };
+
+  const wrappedUpdateProduct = async (id: string, prevState: unknown, formData: FormData) => {
+    const result = await updateProduct(id, null, formData);
+    if (result) {
+      await handleSuccess();
+    }
+    return result;
+  };
+
   const [error, action] = useFormState(
-    product == null ? addProduct : updateProduct.bind(null, product.id),
+    product == null ? wrappedAddProduct : wrappedUpdateProduct.bind(null, product.id),
     {}
-  )
+  );
+
   const [priceInCents, setPriceInCents] = useState<number | undefined>(
     product?.priceInCents
   )
@@ -68,7 +104,7 @@ export function ProductForm({ product }: { product?: Product | null }) {
         {product != null && (
           <div className="text-muted-foreground">{product.filePath}</div>
         )}
-        {error.file && <div className="text-destructive">{error.file}</div>}
+        {/* {error.filePath && <div className="text-destructive">{error.file}</div>} */}
       </div>
       <div className="space-y-2">
         <Label htmlFor="image">Image</Label>
@@ -81,7 +117,7 @@ export function ProductForm({ product }: { product?: Product | null }) {
             alt="Product Image"
           />
         )}
-        {error.image && <div className="text-destructive">{error.image}</div>}
+        {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
       </div>
       <SubmitButton />
     </form>
