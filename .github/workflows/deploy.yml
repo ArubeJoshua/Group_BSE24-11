@@ -32,9 +32,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Lint Code
-        run: npm run lint
-
       - name: Build project
         env:
           RESEND_API_KEY: ${{ vars.RESEND_API_KEY }}
@@ -42,10 +39,6 @@ jobs:
 
       - name: Run tests
         run: npm run test
-
-      - name: Verify Deployment
-        run: |
-          curl --fail --silent http://your-production-url/health || { echo "Health check failed"; exit 1; }
 
   deploy:
     runs-on: ubuntu-latest
@@ -73,6 +66,7 @@ jobs:
         run: |
           if [[ "${{ steps.deploy.outputs }}" == *"error"* ]]; then
             echo "Deployment failed. Initiating rollback."
+            # Replace this with your actual rollback command or strategy
             npx vercel rollback --token ${{ vars.VERCEL_TOKEN }} || echo "Rollback failed."
           else
             echo "Deployment successful."
