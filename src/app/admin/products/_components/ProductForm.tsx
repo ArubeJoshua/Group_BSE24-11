@@ -104,7 +104,7 @@ export function ProductForm({ product }: { product?: Product | null }) {
         {product != null && (
           <div className="text-muted-foreground">{product.filePath}</div>
         )}
-        {error.file && <div className="text-destructive">{error.file}</div>}
+        {/* {error.filePath && <div className="text-destructive">{error.file}</div>} */}
       </div>
       <div className="space-y-2">
         <Label htmlFor="image">Image</Label>
@@ -117,7 +117,7 @@ export function ProductForm({ product }: { product?: Product | null }) {
             alt="Product Image"
           />
         )}
-        {error.image && <div className="text-destructive">{error.image}</div>}
+        {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
       </div>
       <SubmitButton />
     </form>
