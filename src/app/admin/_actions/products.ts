@@ -58,11 +58,6 @@ export async function addProduct(prevState: unknown, formData: FormData) {
     imagePath: product.imagePath,
     isAvailableForPurchase: product.isAvailableForPurchase,
   };
-
-  revalidatePath("/")
-  revalidatePath("/products")
-
-  redirect("/admin/products")
 }
 
 const editSchema = addSchema.extend({
