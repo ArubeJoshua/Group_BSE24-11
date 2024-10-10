@@ -58,4 +58,16 @@ jobs:
         run: npm ci
 
       - name: Deploy to Vercel
-        run: npx vercel --prod --token ${{ vars.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          npx vercel --prod --token ${{ vars.VERCEL_TOKEN }} || echo "Deployment failed" >> $GITHUB_ENV
+
+      - name: Check deployment status
+        run: |
+          if [[ "${{ steps.deploy.outputs }}" == *"error"* ]]; then
+            echo "Deployment failed. Initiating rollback."
+            # Replace this with your actual rollback command or strategy
+            npx vercel rollback --token ${{ vars.VERCEL_TOKEN }} || echo "Rollback failed."
+          else
+            echo "Deployment successful."
+          fi
