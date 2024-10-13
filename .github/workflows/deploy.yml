@@ -37,12 +37,6 @@ jobs:
           RESEND_API_KEY: ${{ vars.RESEND_API_KEY }}
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: .next/
-
       - name: Run tests
         run: npm run test
 
@@ -63,10 +57,8 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
+      - name: Install dependencies
+        run: npm ci
 
       - name: Deploy to Vercel
         id: deploy
