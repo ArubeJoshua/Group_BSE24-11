@@ -61,8 +61,11 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 }
 
 const editSchema = addSchema.extend({
-  file: fileSchema.optional(),
-  image: imageSchema.optional(),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  priceInCents: z.coerce.number().int().min(1),
+  file: fileSchema,
+  image: imageSchema,
 })
 
 export async function updateProduct(
