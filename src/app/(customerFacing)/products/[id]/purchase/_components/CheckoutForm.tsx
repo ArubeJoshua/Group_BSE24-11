@@ -110,7 +110,7 @@ function Form({
         </CardHeader>
         <CardContent>
           <div className="mt-4">
-          <Label htmlFor="email">Please input your email to book the product</Label>
+          <Label htmlFor="email">Please input your email to purchase the product</Label>
             <Input
               type="email"
               id="email"
