@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { formatCurrency } from "@/lib/formatters"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { FormEvent, useState } from "react"
 
 type CheckoutFormProps = {
@@ -61,9 +62,17 @@ function Form({
   priceInCents: number
   productId: string
 }) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
   const [email, setEmail] = useState<string>()
+
+  const handleSuccess = async () => {
+    await fetch('/api/revalidate?path=/');
+    await fetch('/api/revalidate?path=/products');
+
+    router.push(`/purchase-success?productId=${productId}`);
+  };
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -90,6 +99,7 @@ function Form({
       formData.append("pricePaidInCents", String(priceInCents));
 
       await addOrder(null, formData);
+      handleSuccess();
     } catch (error) {
       setErrorMessage("An error occurred while processing your order. Please try again.");
     } finally {
@@ -110,7 +120,7 @@ function Form({
         </CardHeader>
         <CardContent>
           <div className="mt-4">
-          <Label htmlFor="email">Please input your email to book the product</Label>
+          <Label htmlFor="email">Please input your email to purchase the product</Label>
             <Input
               type="email"
               id="email"
